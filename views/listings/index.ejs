@@ -1,0 +1,151 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter {
+    text-align: center;
+    margin-right: 2rem;
+    margin-top: 1.5rem;
+    opacity: 0.7;
+  }
+  .filter:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
+  .filter p {
+    font-size: 0.8rem;
+  }
+  .tax-info {
+    display: none;
+  }
+  .total-price {
+    font-weight: bold;
+    color: #2c5aa0;
+  }
+  .tax-toggle{
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 3.5rem;
+    padding: 1rem;
+    margin-left: auto;
+  }
+</style>
+
+<div id="filters">
+  <div class="filter">
+    <div><i class="fa-solid fa-fire"></i></div>
+    <p>Trending</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-bed"></i></div>
+    <p>Rooms</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-mountain-city"></i></div>
+    <p>Iconic Cities</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-mountain"></i></div>
+    <p>Mountains</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-chess-rook"></i></div>
+    <p>Castles</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-person-swimming"></i></div>
+    <p>Amazing Pools</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-campground"></i></div>
+    <p>Camping</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-cow"></i></div>
+    <p>Farms</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-snowflake"></i></div>
+    <p>Arctic</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-tree"></i></div>
+    <p>Forest</p>
+  </div>
+  <div class="filter">
+    <div><i class="fa-solid fa-sun"></i></div>
+    <p>Desert</p>
+  </div>
+  <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="flexSwitchCheckDefault"
+      />
+      <label class="form-check-label" for="flexSwitchCheckDefault"
+        >Display Total After Taxes</label
+      >
+    </div>
+  </div>
+</div>
+
+<div class="row row-cols-lg-3 row-cols-md-2 mt-3 row-cols-sm-1">
+  <%for(let listing of allListings){%>
+  <a href="/listings/<%=listing._id%>" class="listing-link">
+    <div class="card col listing-card">
+      <img
+        class="card-img-top"
+        src="<%= listing.image.url%>"
+        alt="listing_image"
+        style="height: 20rem"
+      />
+      <div class="card-img-overlay"></div>
+      <div class="card-body">
+        <p class="card-text">
+          <b><%= listing.title %></b><br />
+          <span class="price-display">&#8377; <%= listing.price.toLocaleString("en-IN") %> /night</span>
+          <span class="total-price" style="display: none;">&#8377; <%= Math.round(listing.price * 1.18).toLocaleString("en-IN") %> /night (incl. taxes)</span>
+          <span class="original-price" data-price="<%= listing.price %>"></span>
+        </p>
+      </div>
+    </div>
+  </a>
+  <%}%>
+</div>
+
+<script>
+    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+    taxSwitch.addEventListener("click", () => {
+
+      let taxInfo = document.querySelectorAll(".tax-info");
+      let priceDisplays = document.querySelectorAll(".price-display");
+      let totalPrices = document.querySelectorAll(".total-price");
+      
+      // Toggle tax info display
+      for(info of taxInfo) {
+        if(info.style.display !='inline'){
+          info.style.display = 'inline';
+        }else{
+          info.style.display = 'none';
+        }
+      }
+      
+      // Toggle between original price and total price with taxes
+      for(let i = 0; i < priceDisplays.length; i++) {
+        if(taxSwitch.checked) {
+          // Show total price with taxes
+          priceDisplays[i].style.display = 'none';
+          totalPrices[i].style.display = 'inline';
+        } else {
+          // Show original price
+          priceDisplays[i].style.display = 'inline';
+          totalPrices[i].style.display = 'none';
+        }
+      }
+    });
+</script>
