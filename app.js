@@ -71,10 +71,6 @@ const sessionOptions = {
   }
 };
 
-app.get("/", (req, res) => {
-  res.redirect("/listings");
-});
-
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -92,6 +88,10 @@ app.use((req, res, next) => {
   console.log("Current user:", req.user ? req.user.username : "Not logged in");
   next();
 })
+
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
 
 app.get("/demouser", async (req, res) => {
   let fakeUser = new User({
