@@ -82,6 +82,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+  console.log("Session ID:", req.sessionID);
+  console.log("Session data:", req.session);
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error"); 
   res.locals.currentUser = req.user; // Make currentUser available in all templates
