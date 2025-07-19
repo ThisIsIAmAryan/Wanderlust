@@ -58,6 +58,9 @@ store.on("error", (err)=>{
   console.log("Mongo Session store error", err);
 })
 
+// Add trust proxy for Render's proxy setup
+app.set('trust proxy', 1);
+
 const sessionOptions = {
   store,
   secret: process.env.SECRET,
@@ -68,6 +71,7 @@ const sessionOptions = {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax' // Allow cross-site cookies in production
   }
 };
 
@@ -78,12 +82,27 @@ app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser((user, done) => {
+  console.log("Serializing user:", user._id);
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    console.log("Deserializing user ID:", id);
+    const user = await User.findById(id);
+    console.log("Deserialized user:", user ? user.username : "Not found");
+    done(null, user);
+  } catch (err) {
+    console.log("Deserialization error:", err);
+    done(err, null);
+  }
+});
 
 app.use((req, res, next) => {
   console.log("Session ID:", req.sessionID);
-  console.log("Session data:", req.session);
+  console.log("Session data:", JSON.stringify(req.session, null, 2));
+  console.log("Is authenticated:", req.isAuthenticated ? req.isAuthenticated() : "N/A");
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error"); 
   res.locals.currentUser = req.user; // Make currentUser available in all templates
