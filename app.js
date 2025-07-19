@@ -22,6 +22,11 @@ const userRouter = require("./routes/user.js");
 
 const dbUrl = process.env.ATLAS_DB_URL;
 
+if (!dbUrl) {
+  console.error("ATLAS_DB_URL is required");
+  process.exit(1);
+}
+
 main()
   .then(() => {
     console.log("Connected to DB");
@@ -62,6 +67,7 @@ const sessionOptions = {
     expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
   }
 };
 
