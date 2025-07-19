@@ -54,7 +54,7 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600 // time period in seconds after which the session will be updated
 });
 
-store.on("error", ()=>{
+store.on("error", (err)=>{
   console.log("Mongo Session store error", err);
 })
 
@@ -64,7 +64,7 @@ const sessionOptions = {
   resave: false,
   saveUninitialized: true,
   cookie:{
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
     httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
     secure: process.env.NODE_ENV === "production", // HTTPS only in production
@@ -89,6 +89,7 @@ app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error"); 
   res.locals.currentUser = req.user; // Make currentUser available in all templates
+  console.log("Current user:", req.user ? req.user.username : "Not logged in");
   next();
 })
 
